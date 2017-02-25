@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-source /opt/ros/kinetic/setup.bash
+source /opt/ros/jade/setup.bash
 
 ~/arduino-1.8.1/arduino --upload Arduino-JD6330.ino
 
