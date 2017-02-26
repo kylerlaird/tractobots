@@ -265,7 +265,10 @@ void setup() {
 	pinMode(hitch_down_pin, OUTPUT);
 	pinMode(hitch_up_pin, OUTPUT);
 	hitch(0);		
-	
+
+	// Configure throttle.
+	throttle(80);
+
 	// Initialize our rosserial link.
 	nh.initNode();
 
@@ -280,6 +283,9 @@ void setup() {
 	nh.advertise(hitch_pub);
 	nh.subscribe(hitch_sub);
 
+	nh.advertise(throttle_pub);
+	nh.subscribe(throttle_sub);
+	
 	//steering_PID.SetOutputLimits(-255.0, +255.0);
 	//steering_PID.SetOutputLimits(-25.0, +25.0);
 	steering_PID.SetOutputLimits(-20.0, +20.0);
@@ -320,6 +326,7 @@ void loop() {
 			);
 		}
 
+/*
 		dtostrf(shuttle_position, 6, 2, message);
 		sprintf(message + strlen(message), "/");
 
@@ -347,6 +354,8 @@ void loop() {
 
 		nh.logwarn(message);
 
+*/
+
 		steering_position_message.data = int(steering_position) >> 2;
 		steering_pub.publish( &steering_position_message );
 
@@ -356,7 +365,7 @@ void loop() {
 		ignition_pub.publish( &ignition_enable_message );
 		hitch_pub.publish( &hitch_message );
 
-		throttle_message.data = analogRead(throttle_in_pin);
+		throttle_message.data = int(analogRead(throttle_in_pin)) >> 2;
 		throttle_pub.publish( &throttle_message );
 	}
 
