@@ -2,6 +2,7 @@
 
 source /opt/ros/kinetic/setup.bash
 
+#~/arduino-1.8.1/arduino --verify Arduino-JD6330.ino
 ~/arduino-1.8.1/arduino --upload Arduino-JD6330.ino
 
 rosrun rosserial_python serial_node.py /dev/ttyUSB0 _baud:=57600
