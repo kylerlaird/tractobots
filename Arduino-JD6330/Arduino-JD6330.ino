@@ -99,6 +99,8 @@ char message[100];
 
 int loop_count = 0;
 
+int passthrough = 1;
+
 int steering_left_pin = 3;
 int steering_right_pin = 5;
 int steering_position_pin = 1;
@@ -174,6 +176,10 @@ void activity() {
 void set_steering( const std_msgs::UInt8& cmd_msg) {
 	nh.logwarn("set_steering()");
 
+	if (passthrough) {
+		return;
+	}
+
 	steering_desired = cmd_msg.data << 2;
 	activity(); 
 }
@@ -187,15 +193,25 @@ void ignition(byte i) {
 
 void set_ignition( const std_msgs::Bool& cmd_msg) {
 	nh.logwarn("set_ignition()");
+	if (passthrough) {
+		return;
+	}
 
 	ignition(cmd_msg.data);
 }
 
+void shuttle(int i) {
+	shuttle_desired = i;
+	activity(); 
+}
+
 void set_shuttle( const std_msgs::UInt8& cmd_msg) {
 	nh.logwarn("set_shuttle()");
+	if (passthrough) {
+		return;
+	}
 
-	shuttle_desired = cmd_msg.data << 2;
-	activity(); 
+	shuttle(cmd_msg.data);
 }
 
 void shuttle_correct() {
@@ -249,6 +265,9 @@ void hitch(int i) {
 
 void set_hitch( const std_msgs::UInt8& cmd_msg) {
 	nh.logwarn("set_hitch()");
+	if (passthrough) {
+		return;
+	}
 
 	hitch(cmd_msg.data);
 	activity();
@@ -260,6 +279,9 @@ void throttle(int i) {
 
 void set_throttle( const std_msgs::UInt8& cmd_msg) {
 	nh.logwarn("set_throttle()");
+	if (passthrough) {
+		return;
+	}
 
 	throttle(cmd_msg.data);
 	activity();
@@ -270,15 +292,18 @@ void setup() {
 	pinMode(ignition_pin, OUTPUT);
 	ignition(0);
 
-	// Configure hitch.
+	// Initialize hitch.
 	pinMode(hitch_down_pin, OUTPUT);
 	pinMode(hitch_up_pin, OUTPUT);
 	hitch(0);		
 
-	// Configure throttle.
+	// Initialize shuttle.
+	shuttle(128);
+
+	// Initialize throttle.
 	throttle(80);
 
-	// Initialize our rosserial link.
+	// Initialize rosserial link.
 	nh.initNode();
 
 	nh.advertise(ignition_pub);
@@ -327,6 +352,14 @@ void loop() {
 
 	// Do ROS stuff.
 	nh.spinOnce();
+
+	int shuttle_lever_reading = int(analogRead(shuttle_lever_pin)) >> 2;
+	int throttle_reading = int(analogRead(throttle_in_pin)) >> 2;
+
+	if (passthrough)  {
+		shuttle(shuttle_lever_reading);
+		throttle(throttle_reading);
+	}
 
 	loop_count += 1;
 	if (loop_count % 1000 == 0) {
@@ -377,14 +410,13 @@ void loop() {
 		ignition_pub.publish( &ignition_enable_message );
 		hitch_pub.publish( &hitch_message );
 
-		throttle_message.data = int(analogRead(throttle_in_pin)) >> 2;
+		throttle_message.data = throttle_reading;
 		throttle_pub.publish( &throttle_message );
 
-		shuttle_lever_message.data = int(analogRead(shuttle_lever_pin)) >> 2;
+		shuttle_lever_message.data = shuttle_lever_reading;
 		shuttle_lever_pub.publish( &shuttle_lever_message );
 	}
 
 
 	delay(1);
 }
-
