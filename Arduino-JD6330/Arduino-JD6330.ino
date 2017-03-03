@@ -127,6 +127,8 @@ int hitch_up_pin = 8;
 int throttle_in_pin = 2;
 int throttle_out_pin = 10;
 
+int shuttle_lever_pin = 3;
+
 std_msgs::UInt8 steering_position_message;
 ros::Publisher steering_pub("/steering/get", &steering_position_message);
 ros::Subscriber<std_msgs::UInt8> steering_sub("/steering/put", set_steering);
@@ -134,6 +136,9 @@ ros::Subscriber<std_msgs::UInt8> steering_sub("/steering/put", set_steering);
 std_msgs::UInt8 shuttle_position_message;
 ros::Publisher shuttle_pub("/transmission/shuttle/get", &shuttle_position_message);
 ros::Subscriber<std_msgs::UInt8> shuttle_sub("/transmission/shuttle/put", set_shuttle);
+
+std_msgs::UInt8 shuttle_lever_message;
+ros::Publisher shuttle_lever_pub("/transmission/shuttle/lever", &shuttle_lever_message);
 
 std_msgs::Bool ignition_enable_message;
 ros::Publisher ignition_pub("/ignition/get", &ignition_enable_message);
@@ -285,6 +290,8 @@ void setup() {
 
 	nh.advertise(throttle_pub);
 	nh.subscribe(throttle_sub);
+
+	nh.advertise(shuttle_lever_pub);
 	
 	//steering_PID.SetOutputLimits(-255.0, +255.0);
 	//steering_PID.SetOutputLimits(-25.0, +25.0);
@@ -367,6 +374,9 @@ void loop() {
 
 		throttle_message.data = int(analogRead(throttle_in_pin)) >> 2;
 		throttle_pub.publish( &throttle_message );
+
+		shuttle_lever_message.data = int(analogRead(shuttle_lever_pin)) >> 2;
+		shuttle_lever_pub.publish( &shuttle_lever_message );
 	}
 
 
