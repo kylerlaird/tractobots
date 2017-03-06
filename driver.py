@@ -246,7 +246,7 @@ class Compass_Follower():
 
 		return(solution)
 
-class MT765():
+class Tractobot():
 	def __init__(self, name):
 		self.name = name
 		self.frame = nvector.FrameE(name='WGS84')
@@ -263,11 +263,26 @@ class MT765():
 		#self.transmission = Setting_Publisher('/transmission/setting', Scaler(+1, -1, 64, 192))
 
 		# 2016.10.10
-		self.steering = Setting_Publisher('/steering/put', Scaler(+1, -1, 104, 152))
-		self.transmission = Setting_Publisher('/transmission/put', Scaler(+1, -1, 64, 192))
-		self.throttle = Setting_Publisher('/throttle/put', Scaler(+1, 0, 20, 230))
+		#self.steering = Setting_Publisher('/steering/put', Scaler(+1, -1, 104, 152))
+		#self.transmission = Setting_Publisher('/transmission/put', Scaler(+1, -1, 64, 192))
+		#self.throttle = Setting_Publisher('/throttle/put', Scaler(+1, 0, 20, 230))
 
+		# 2017.02.19
+		self.steering = Setting_Publisher('/steering/put', Scaler(+1, -1, 255, 75))
+		self.transmission = Setting_Publisher('/transmission/shuttle/put', Scaler(-1, +1, 10, 250))
+		#self.throttle = Setting_Publisher('/throttle/put', Scaler(+1, 0, 20, 230))
+		#self.throttle = Setting_Publisher('/throttle/put', Scaler(+0, 1, 20, 230))
+		#self.throttle = Setting_Publisher('/throttle/put', Scaler(+0, 1, 20, 120)) # 3.7MPH
+		self.throttle = Setting_Publisher('/throttle/put', Scaler(+0, 1, 20, 150)) # 4.3MPH
+		self.throttle = Setting_Publisher('/throttle/put', Scaler(+0, 1, 20, 135)) # MPH
 
+		self.ignition = rospy.Publisher('/ignition/put', std_msgs.msg.Bool, queue_size=1)
+
+		self.hitch = rospy.Publisher('/hitch/put', std_msgs.msg.UInt8, queue_size=1)
+	
+		self.passthrough = rospy.Publisher('/passthrough/put', std_msgs.msg.Bool, queue_size=1)
+
+		
 		if False:
 			for i in range(-10, 10):
 				j = i / 10.
@@ -347,6 +362,28 @@ class MT765():
 
 		#self._enabled = False
 
+	def stop(self):
+		# first priority
+		self.ignition.publish(False)
+
+		rospy.loginfo('stopping tractor')
+
+		self.navigator = None	
+		#self.all_neutral()
+		self._enabled = False
+
+	
+	def start(self):
+		#rospy.loginfo('starting tractor')
+		rospy.loginfo('leaving passthrough mode')
+
+		self.navigator = None	
+		self.all_neutral()
+		self._enabled = True
+
+		self.ignition.publish(True)
+		self.passthrough.publish(False)
+	
 	def set_navigator(self, navigator):
 		#if str(self.navigator) == str(navigator):
 		#	return
@@ -366,21 +403,26 @@ class MT765():
 
 
 		self.reset_timeout()
-	
+
 		left_joy_x = joy_data.axes[0]
 		left_joy_y = joy_data.axes[1]
 		left_trigger = joy_data.axes[2]
 		left_trigger_button = joy_data.buttons[4]
+		left_joy_button = joy_data.buttons[9]
 		button_back = joy_data.buttons[6]
 		button_start = joy_data.buttons[7]
 		button_nav = joy_data.buttons[0]
 
-	
+		right_joy_y = joy_data.axes[4]
+
 		#print joy_data.buttons, joy_data.axes
 	
 		if button_back:
-			self.disable()
-	
+			#self.disable()
+			self.stop()
+		elif button_start:
+			self.start()
+		
 		# Sometimes the left_trigger initializes at 0.
 		# Ensure it's at rest before enabling the tractor.
 		if not self.enabled() and left_trigger < -0.9 and button_start:
@@ -389,19 +431,31 @@ class MT765():
 		#	self.steering.calibrate()
 	
 
-		throttle_position = (1 - left_trigger) / 2.
-	
-		#transmission_position = (1 - left_trigger) / 2. 
-		# Reverse if left trigger.
-		#if False and left_trigger_button:
-		#	transmission_position = -transmission_position			
 
-		# Go forward on left trigger button.
+		# hitch down
+		if right_joy_y < -0.5:
+			print 'hitch down'
+			self.hitch.publish(1)	
+		elif right_joy_y > +0.5:
+			print 'hitch up'
+			self.hitch.publish(2)	
+		# hitch noop
+		else:
+			self.hitch.publish(0)	
+			None
+
+		throttle_position = (1 - left_trigger) / 2.
+
+
 		if left_trigger_button:
-			transmission_position = 1.0
+			if left_joy_button:
+				# reverse
+				transmission_position = -1.0
+			else:
+				transmission_position = +1.0
 		else:
 			transmission_position = 0.0
-			
+
 		wheel_position = left_joy_x
 
 
@@ -493,9 +547,9 @@ class MT765():
 		self.steering(wheel_position)
 		self.throttle(throttle_position)
 	
-		#rospy.loginfo('left_joy_x: %0.2f steering_position: %0.4f, transmission_position: %0.4f' % (
-		#	left_joy_x, steering_position, transmission_position,
-		#))
+		rospy.loginfo('left_joy_x: %0.2f steering_position: %0.4f, transmission_position: %0.4f' % (
+			left_joy_x, wheel_position, transmission_position,
+		))
 		
 		return	
 
@@ -529,7 +583,7 @@ class MT765():
 if __name__ == '__main__':
 	rospy.init_node('joy_subscriber', anonymous=True)
 				
-	tractor = MT765(name='MT765')
+	tractor = Tractobot(name='JD6330')
 
 	rospy.Subscriber('/joy', sensor_msgs.msg.Joy, tractor.handle_joystick)
 	rospy.Subscriber('/gps/dict', std_msgs.msg.String, tractor.handle_gps_dict)

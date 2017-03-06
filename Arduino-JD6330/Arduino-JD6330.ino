@@ -92,16 +92,17 @@
 
 ros::NodeHandle nh;
 
-unsigned long timeout_period = 1100;    // milliseconds of no updates before stopping
-unsigned long alarm_clock;
+unsigned long timeout_period = 2000;    // milliseconds of no updates before stopping
+//unsigned long timeout_period = 11000;    // milliseconds of no updates before stopping
+unsigned long last_activity;
 
-char message[100];
+char buffer[100];
 
 int loop_count = 0;
 
-int passthrough = 1;
+int pt = 1;
 
-int steering_left_pin = 3;
+int steering_left_pin = 4;
 int steering_right_pin = 5;
 int steering_position_pin = 1;
 double steering_position = 128 << 2 ;
@@ -112,10 +113,11 @@ double steering_desired = 0;
 
 double steering_correction = 0;
 // PID steering_PID(&steering_position, &steering_correction, &steering_desired, 0.1, 0.02, 0.01, DIRECT);
-PID steering_PID(&steering_position, &steering_correction, &steering_desired, 0.6, 0.02, 0.01, DIRECT);
+//PID steering_PID(&steering_position, &steering_correction, &steering_desired, 0.6, 0.02, 0.01, DIRECT);
+PID steering_PID(&steering_position, &steering_correction, &steering_desired, 0.6, 0.01, 0.01, DIRECT);
 
-int shuttle_aft_pin = 6;
-int shuttle_fore_pin = 9;
+int shuttle_aft_pin = 2;
+int shuttle_fore_pin = 3;
 int shuttle_position_pin = 0;
 double shuttle_position = 128 << 2;
 double shuttle_desired = 128 << 2;
@@ -125,10 +127,10 @@ PID shuttle_PID(&shuttle_position, &shuttle_correction, &shuttle_desired, 5, 1, 
 int shuttle_speed = 0;
 int steering_speed = 0;
 
-int ignition_pin = 4;
+int ignition_pin = 14;
 
-int hitch_down_pin = 7;
-int hitch_up_pin = 8;
+int hitch_down_pin = 15;
+int hitch_up_pin = 16;
 
 int throttle_in_pin = 2;
 int throttle_out_pin = 10;
@@ -137,32 +139,39 @@ int shuttle_lever_pin = 3;
  
 std_msgs::UInt8 steering_position_message;
 ros::Publisher steering_pub("/steering/get", &steering_position_message);
-ros::Subscriber<std_msgs::UInt8> steering_sub("/steering/put", set_steering);
+ros::Subscriber<std_msgs::UInt8> steering_sub("/steering/put", command_steering);
 
 std_msgs::UInt8 shuttle_position_message;
 ros::Publisher shuttle_pub("/transmission/shuttle/get", &shuttle_position_message);
-ros::Subscriber<std_msgs::UInt8> shuttle_sub("/transmission/shuttle/put", set_shuttle);
+ros::Subscriber<std_msgs::UInt8> shuttle_sub("/transmission/shuttle/put", command_shuttle);
 
 std_msgs::Bool ignition_enable_message;
 ros::Publisher ignition_pub("/ignition/get", &ignition_enable_message);
-ros::Subscriber<std_msgs::Bool> ignition_sub("/ignition/put", set_ignition);
+ros::Subscriber<std_msgs::Bool> ignition_sub("/ignition/put", command_ignition);
 
 std_msgs::UInt8 hitch_message;
 ros::Publisher hitch_pub("/hitch/get", &hitch_message);
-ros::Subscriber<std_msgs::UInt8> hitch_sub("/hitch/put", set_hitch);
+ros::Subscriber<std_msgs::UInt8> hitch_sub("/hitch/put", command_hitch);
 
 std_msgs::UInt8 throttle_message;
 ros::Publisher throttle_pub("/throttle/get", &throttle_message);
-ros::Subscriber<std_msgs::UInt8> throttle_sub("/throttle/put", set_throttle);
+ros::Subscriber<std_msgs::UInt8> throttle_sub("/throttle/put", command_throttle);
 
 std_msgs::UInt8 shuttle_lever_message;
 ros::Publisher shuttle_lever_pub("/transmission/shuttle/lever", &shuttle_lever_message);
 
+std_msgs::Bool passthrough_message;
+ros::Publisher passthrough_pub("/passthrough/get", &passthrough_message);
+ros::Subscriber<std_msgs::Bool> passthrough_sub("/passthrough/put", command_passthrough);
 
 void snooze() {
-	// nh.logwarn("snooze()");
+	//nh.logwarn("snooze()");
         
-	alarm_clock = millis() + timeout_period;
+	//alarm_clock = millis() + timeout_period;
+	
+	last_activity = millis();
+
+	//sprintf(buffer, "snooze %lu", last_activity); nh.logwarn(buffer);
 }
 
 void activity() {
@@ -173,41 +182,63 @@ void activity() {
 }
 
 
-void set_steering( const std_msgs::UInt8& cmd_msg) {
-	nh.logwarn("set_steering()");
+void steering(int i) {
+	steering_desired = i << 2;
 
-	if (passthrough) {
+	if (steering_desired == 0) {
+		steering_disable();
+	}
+}
+
+
+void command_steering( const std_msgs::UInt8& cmd_msg) {
+	// nh.logwarn("command_steering()");
+	activity(); 
+
+	if (pt) {
 		return;
 	}
 
-	steering_desired = cmd_msg.data << 2;
-	activity(); 
+	steering(cmd_msg.data);
+}
+
+void passthrough(byte i) {
+	sprintf(buffer, "passthrough(%d)", i); nh.logwarn(buffer);
+
+	pt = i;
+	if (pt) {
+		steering(0);
+	}
+}
+
+void command_passthrough( const std_msgs::Bool& cmd_msg) {
+	nh.logwarn("command_passthrough()");
+	activity();
+
+	passthrough(cmd_msg.data);
 }
 
 void ignition(byte i) {
 	digitalWrite(ignition_pin, i);
 	ignition_enable_message.data = i;
 
-	activity(); 
 }
 
-void set_ignition( const std_msgs::Bool& cmd_msg) {
-	nh.logwarn("set_ignition()");
-	if (passthrough) {
-		return;
-	}
+void command_ignition( const std_msgs::Bool& cmd_msg) {
+	nh.logwarn("command_ignition()");
 
 	ignition(cmd_msg.data);
 }
 
 void shuttle(int i) {
-	shuttle_desired = i;
-	activity(); 
+	shuttle_desired = (double)(i << 2);
 }
 
-void set_shuttle( const std_msgs::UInt8& cmd_msg) {
-	nh.logwarn("set_shuttle()");
-	if (passthrough) {
+void command_shuttle( const std_msgs::UInt8& cmd_msg) {
+	//nh.logwarn("command_shuttle()");
+	activity(); 
+
+	if (pt) {
 		return;
 	}
 
@@ -231,21 +262,23 @@ void shuttle_correct() {
 	}
 }
 
+void steering_disable() {
+	analogWrite(steering_right_pin, 0);
+	analogWrite(steering_left_pin, 0);
+}
+
 void steering_correct() {
 	steering_speed = abs(steering_correction);
-	// steering_speed = 235;
-	// steering_speed = 255;
 	
 	if (steering_speed < 2) {
 		analogWrite(steering_left_pin, 0);			
 		analogWrite(steering_right_pin, 0);
 	} else if (steering_correction > 0) {
-		analogWrite(steering_left_pin, 0);			
-		analogWrite(steering_right_pin, 230 + steering_speed);
-	} else if (steering_correction < 0) {
-		// aft correction
 		analogWrite(steering_right_pin, 0);
-		analogWrite(steering_left_pin, 230 + steering_speed);			
+		analogWrite(steering_left_pin, 223 + steering_speed);			
+	} else if (steering_correction < 0) {
+		analogWrite(steering_left_pin, 0);			
+		analogWrite(steering_right_pin, 225 + steering_speed);
 	}
 }
 
@@ -263,28 +296,30 @@ void hitch(int i) {
 	hitch_message.data = i;
 }
 
-void set_hitch( const std_msgs::UInt8& cmd_msg) {
-	nh.logwarn("set_hitch()");
-	if (passthrough) {
+void command_hitch( const std_msgs::UInt8& cmd_msg) {
+	nh.logwarn("command_hitch()");
+	activity();
+
+	if (pt) {
 		return;
 	}
 
 	hitch(cmd_msg.data);
-	activity();
 }
 
 void throttle(int i) {
 	analogWrite(throttle_out_pin, i);
 }
 
-void set_throttle( const std_msgs::UInt8& cmd_msg) {
-	nh.logwarn("set_throttle()");
-	if (passthrough) {
+void command_throttle( const std_msgs::UInt8& cmd_msg) {
+	// nh.logwarn("command_throttle()");
+	activity();
+
+	if (pt) {
 		return;
 	}
 
 	throttle(cmd_msg.data);
-	activity();
 }
 
 void setup() {
@@ -321,10 +356,15 @@ void setup() {
 	nh.subscribe(throttle_sub);
 	
 	nh.advertise(shuttle_lever_pub);
-  
+
+	nh.advertise(passthrough_pub);
+	nh.subscribe(passthrough_sub);
+
 	//steering_PID.SetOutputLimits(-255.0, +255.0);
 	//steering_PID.SetOutputLimits(-25.0, +25.0);
-	steering_PID.SetOutputLimits(-20.0, +20.0);
+	//steering_PID.SetOutputLimits(-20.0, +20.0);
+	//steering_PID.SetOutputLimits(-10.0, +10.0);
+	steering_PID.SetOutputLimits(-30.0, +30.0);
 	steering_PID.SetSampleTime(50);
 	steering_PID.SetMode(AUTOMATIC);
 
@@ -338,27 +378,48 @@ void setup() {
 }
 
 void loop() {
-	// nh.logwarn("loop()");
- 
-	if (steering_desired != 0) {
-		steering_position = analogRead(steering_position_pin);
-		steering_PID.Compute();
-		steering_correct();
-	}
-
-	shuttle_position = analogRead(shuttle_position_pin);
-	shuttle_PID.Compute();
-	shuttle_correct();
-
 	// Do ROS stuff.
 	nh.spinOnce();
+
+	steering_position = analogRead(steering_position_pin);
+	shuttle_position = analogRead(shuttle_position_pin);
 
 	int shuttle_lever_reading = int(analogRead(shuttle_lever_pin)) >> 2;
 	int throttle_reading = int(analogRead(throttle_in_pin)) >> 2;
 
-	if (passthrough)  {
-		shuttle(shuttle_lever_reading);
+	// We always control the shuttle, even in passthrough.
+	shuttle_PID.Compute();
+	shuttle_correct();
+
+
+	if (!pt and ((millis() - last_activity) > timeout_period)) {
+		sprintf(buffer, "%d, %lu, %lu, %lu", pt, millis(), last_activity, millis() - last_activity); nh.logwarn(buffer);
+		passthrough(1);
+	}
+
+	// for testing
+	//delay(500);
+
+	if (pt)  {
+		steering(0);
+
 		throttle(throttle_reading);
+
+		/* yet another hardcoded mess... */
+		if (shuttle_lever_reading < 45) {
+			shuttle(210);
+		} else if (shuttle_lever_reading > 135) {
+			shuttle(40);
+		} else {
+			shuttle(128);
+		}
+	} else {
+		//sprintf(buffer, "steer"); nh.logwarn(buffer);
+
+		if (steering_desired != 0) {
+			steering_PID.Compute();
+			steering_correct();
+		}
 	}
 
 	loop_count += 1;
@@ -415,8 +476,12 @@ void loop() {
 
 		shuttle_lever_message.data = shuttle_lever_reading;
 		shuttle_lever_pub.publish( &shuttle_lever_message );
+
+		passthrough_message.data = pt;
+		passthrough_pub.publish( &passthrough_message );
 	}
 
 
 	delay(1);
 }
+

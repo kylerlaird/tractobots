@@ -1,9 +1,11 @@
 #!/bin/bash -e
 
+device=/dev/ttyACM2
+
 source /opt/ros/kinetic/setup.bash
 
 #~/arduino-1.8.1/arduino --verify Arduino-JD6330.ino
-#~/arduino-1.8.1/arduino --upload Arduino-JD6330.ino
-~/arduino-*/arduino --upload Arduino-JD6330.ino
+~/arduino-1.6.13/arduino --upload --port ${device} Arduino-JD6330.ino
+#~/arduino-*/arduino --upload Arduino-JD6330.ino
 
-rosrun rosserial_python serial_node.py /dev/ttyUSB0 _baud:=57600
+rosrun rosserial_python serial_node.py ${device} _baud:=57600
