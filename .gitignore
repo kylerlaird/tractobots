@@ -1,0 +1,11 @@
+# Do not track files with this endings:
+*~
+*orig
+*.autosave
+*.workspace
+*.user
+# Ignore these Paths:
+.catkin_tools
+devel
+build
+logs

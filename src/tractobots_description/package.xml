@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <name>tractobots_description</name>
+  <version>0.0.1</version>
+  <description>
+  The tractobots_description package contains URDF files and meshes
+  for the tractobots project. It is used for computing the needed
+  transforms and for visualization in RViz.
+  </description>
+
+  <author email="alfonso.troya@gmail.com">Alfonso Troya</author>
+  <maintainer email="alfonso.troya@gmail.com">Alfonso Troya</maintainer>
+  <url type="repository">https://github.com/kylerlaird/tractobots.git</url>
+  <license>GPLv3</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>

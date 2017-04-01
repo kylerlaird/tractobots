@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot>
+
+  <!-- Links -->
+  <link name="base_link"/>
+  <xacro:wheel name="front_right_wheel" width="${front_wheel_width}" radius="${front_wheel_radius}" mass="${front_wheel_mass}"/>
+  <xacro:wheel name="front_left_wheel"  width="${front_wheel_width}" radius="${front_wheel_radius}" mass="${front_wheel_mass}"/>
+  <xacro:wheel name="rear_right_wheel"  width="${rear_wheel_width}"  radius="${rear_wheel_radius}"  mass="${rear_wheel_mass}"/>
+  <xacro:wheel name="rear_left_wheel"   width="${rear_wheel_width}"  radius="${rear_wheel_radius}"  mass="${rear_wheel_mass}"/>
+
+  <!-- Joints-->
+  <joint name="chassis_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="front_right_wheel_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="front_right_wheel"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="front_left_wheel_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="front_left_wheel"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="rear_right_wheel_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="rear_right_wheel"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="rear_left_wheel_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="rear_left_wheel"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+
+</robot>
