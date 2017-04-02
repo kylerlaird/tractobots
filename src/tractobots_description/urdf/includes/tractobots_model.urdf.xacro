@@ -1,43 +1,92 @@
-<?xml version="1.0"?>
-<robot>
+<?xml version="1.0" ?>
+<robot name="tractobots_model" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find tractobots_description)/urdf/includes/tractobots_properties.urdf.xacro" />
+  <xacro:macro name="wheel" params="name width radius mass">
+    <link name="${name}">
+      <collision>
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+        <geometry>
+          <cylinder length="${width}" radius="${radius}" />
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+        <geometry>
+          <cylinder length="${width}" radius="${radius}" />
+        </geometry>
+        <material name="dark_grey"/>
+      </visual>
+      <inertial>
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+        <mass value="${mass}"/>
+        <inertia ixx="${1/12*mass*(3*radius*radius + width*width)}" ixy="0.0" ixz="0.0"
+                       iyy="${1/12*mass*(3*radius*radius + width*width)}" iyz="0.0"
+                       izz="${1/2*mass*radius*radius}"/>
+      </inertial>
+    </link>
+  </xacro:macro>
 
   <!-- Links -->
   <link name="base_link"/>
-  <xacro:wheel name="front_right_wheel" width="${front_wheel_width}" radius="${front_wheel_radius}" mass="${front_wheel_mass}"/>
-  <xacro:wheel name="front_left_wheel"  width="${front_wheel_width}" radius="${front_wheel_radius}" mass="${front_wheel_mass}"/>
-  <xacro:wheel name="rear_right_wheel"  width="${rear_wheel_width}"  radius="${rear_wheel_radius}"  mass="${rear_wheel_mass}"/>
-  <xacro:wheel name="rear_left_wheel"   width="${rear_wheel_width}"  radius="${rear_wheel_radius}"  mass="${rear_wheel_mass}"/>
+  <link name="chassis">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${chassis_mass}"/>
+      <inertia  ixx="${1/12*chassis_mass*(chassis_height*chassis_height + chassis_width*chassis_width)}" ixy="0.0" ixz="0.0"
+                iyy="${1/12*chassis_mass*(chassis_length*chassis_length + chassis_height*chassis_height)}" iyz="0.0"
+                izz="${1/12*chassis_mass*(chassis_length*chassis_length + chassis_width*chassis_width)}"/>
+    </inertial>
 
-  <!-- Joints-->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+      <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+      <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <xacro:wheel name="front_right_wheel"  width="${front_wheel_width}" radius="${front_wheel_radius}" mass="${front_wheel_mass}"/>
+  <xacro:wheel name="front_left_wheel"   width="${front_wheel_width}" radius="${front_wheel_radius}" mass="${front_wheel_mass}"/>
+  <xacro:wheel name="rear_right_wheel"   width="${rear_wheel_width}"  radius="${rear_wheel_radius}"  mass="${rear_wheel_mass}"/>
+  <xacro:wheel name="rear_left_wheel"    width="${rear_wheel_width}"  radius="${rear_wheel_radius}"  mass="${rear_wheel_mass}"/>
+
+  <!-- Joints -->
   <joint name="chassis_joint" type="fixed">
     <parent link="base_link"/>
     <child link="chassis"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 1.0" rpy="0 0 0"/>
   </joint>
 
   <joint name="front_right_wheel_joint" type="fixed">
     <parent link="chassis"/>
     <child link="front_right_wheel"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="${chassis_length/2} ${front_wheel_width/2 + chassis_width/2} 0" rpy="0 0 0"/>
   </joint>
 
   <joint name="front_left_wheel_joint" type="fixed">
     <parent link="chassis"/>
     <child link="front_left_wheel"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="${chassis_length/2} ${-(front_wheel_width/2 + chassis_width/2)} 0" rpy="0 0 0"/>
   </joint>
 
   <joint name="rear_right_wheel_joint" type="fixed">
     <parent link="chassis"/>
     <child link="rear_right_wheel"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="${-chassis_length/2} ${rear_wheel_width/2 + chassis_width/2} ${-(front_wheel_radius - rear_wheel_radius)}" rpy="0 0 0"/>
   </joint>
 
   <joint name="rear_left_wheel_joint" type="fixed">
     <parent link="chassis"/>
     <child link="rear_left_wheel"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="${-chassis_length/2} ${-(rear_wheel_width/2 + chassis_width/2)} ${-(front_wheel_radius - rear_wheel_radius)}" rpy="0 0 0"/>
   </joint>
-
 
 </robot>

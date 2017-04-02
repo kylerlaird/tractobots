@@ -1,23 +1,24 @@
 <?xml version="1.0"?>
-<robot>
+<robot name="xacro_properties"                           xmlns:xacro="http://ros.org/wiki/xacro">
+
   <xacro:property name="M_PI" 				 value="3.1415926535897931"/>
 
   <!-- Constants for chassis -->
-  <xacro:property name="chassis_elevation" 		 value="0.06"/>
-  <xacro:property name="chassis_height" 		 value="0.6"/>
-  <xacro:property name="chassis_length" 		 value="0.4"/>
-  <xacro:property name="chassis_width"  		 value="0.2"/>
+  <xacro:property name="chassis_height" 		 value="0.3"/>
+  <xacro:property name="chassis_length" 		 value="0.5"/>
+  <xacro:property name="chassis_width"  		 value="0.4"/>
   <xacro:property name="chassis_mass"   		 value="20" />
 
   <!-- Constants for front wheels -->
-  <xacro:property name="front_wheel_radius" 		 value="0.5"/>
-  <xacro:property name="front_wheel_width"  		 value="0.2"/>
+  <xacro:property name="front_wheel_radius" 		 value="0.2"/>
+  <xacro:property name="front_wheel_width"  		 value="0.1"/>
   <xacro:property name="front_wheel_mass"   		 value="4"/>
   <xacro:property name="front_wheel_track"  		 value="0.6"/>
 
   <!-- Constants for rear wheels -->
-  <xacro:property name="rear_wheel_radius" 		 value="0.3"/>
-  <xacro:property name="rear_wheel_width" 		 value="0.1"/>
+  <xacro:property name="rear_wheel_radius" 		 value="0.12"/>
+  <xacro:property name="rear_wheel_width" 		 value="0.08"/>
   <xacro:property name="rear_wheel_mass"  		 value="2"/>
   <xacro:property name="rear_wheel_track" 		 value="0.535"/>
+
 </robot>
