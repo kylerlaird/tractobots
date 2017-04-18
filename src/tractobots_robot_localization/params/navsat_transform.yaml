@@ -11,7 +11,7 @@ delay: 0.0
 
 # If your IMU does not account for magnetic declination, enter the value for your location here. If you don't know it,
 # see http://www.ngdc.noaa.gov/geomag-web/ (make sure to convert the value to radians). This parameter is mandatory.
-magnetic_declination_radians: 0  # This should be replaced with the magnetic declination for your location
+magnetic_declination_radians: 0.0712094335  # This should be replaced with the magnetic declination for your location
 
 # Your IMU's yaw, once the magnetic_declination_radians value is added to it, should report 0 when facing east. If it
 # doesn't, enter the offset here. Defaults to 0.
@@ -20,8 +20,9 @@ yaw_offset: 1.5707963268
 # If this is true, the altitude is set to 0 in the output odometry message. Defaults to false.
 zero_altitude: true
 
-# If this is true, the transform world_frame->utm transform is broadcast for use by other nodes. Defaults to false.
-broadcast_utm_transform: false
+# If this is true, the transform between the UTM grid and the frame of the input odometry data is broadcasted for being 
+# use by other nodes.  Defaults to false.
+broadcast_utm_transform: true
 
 # If this is true, all received odometry data is converted back to a lat/lon and published as a NavSatFix message as
 # /gps/filtered. Defaults to false.
