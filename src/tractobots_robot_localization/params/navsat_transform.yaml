@@ -11,11 +11,11 @@ delay: 0.0
 
 # If your IMU does not account for magnetic declination, enter the value for your location here. If you don't know it,
 # see http://www.ngdc.noaa.gov/geomag-web/ (make sure to convert the value to radians). This parameter is mandatory.
-magnetic_declination_radians: 0
+magnetic_declination_radians: 0  # This should be replaced with the magnetic declination for your location
 
 # Your IMU's yaw, once the magnetic_declination_radians value is added to it, should report 0 when facing east. If it
 # doesn't, enter the offset here. Defaults to 0.
-yaw_offset: 0.0
+yaw_offset: 1.5707963268
 
 # If this is true, the altitude is set to 0 in the output odometry message. Defaults to false.
 zero_altitude: true
@@ -37,7 +37,3 @@ use_odometry_yaw: false
 # navsat_transform_node will wait until the user calls the 'datum' service with the SetDatum service message.
 wait_for_datum: false
 
-# Instead of using the first GPS location and IMU-based heading for the local-frame origin, users can specify the
-# origin (datum) using this parameter. The fields in the parameter represent latitude and longitude in decimal degrees,
-# and heading in radians. As navsat_transform_node assumes an ENU standard, a 0 heading corresponds to east.
-datum: [55.944904, -3.186693, 0.0]
