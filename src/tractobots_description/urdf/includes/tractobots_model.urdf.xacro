@@ -1,34 +1,11 @@
 <?xml version="1.0" ?>
 <robot name="tractobots_model" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find tractobots_description)/urdf/includes/tractobots_properties.urdf.xacro" />
-  <xacro:macro name="wheel" params="name width radius mass">
-    <link name="${name}">
-      <collision>
-        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
-        <geometry>
-          <cylinder length="${width}" radius="${radius}" />
-        </geometry>
-      </collision>
-      <visual>
-        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
-        <geometry>
-          <cylinder length="${width}" radius="${radius}" />
-        </geometry>
-        <material name="dark_grey"/>
-      </visual>
-      <inertial>
-        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
-        <mass value="${mass}"/>
-        <inertia ixx="${1/12*mass*(3*radius*radius + width*width)}" ixy="0.0" ixz="0.0"
-                       iyy="${1/12*mass*(3*radius*radius + width*width)}" iyz="0.0"
-                       izz="${1/2*mass*radius*radius}"/>
-      </inertial>
-    </link>
-  </xacro:macro>
 
   <!-- Links -->
   <link name="base_link"/>
-  <link name="chassis">
+
+  <link name="chassis_link">
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="${chassis_mass}"/>
@@ -53,40 +30,165 @@
     </collision>
   </link>
 
-  <xacro:wheel name="front_right_wheel"  width="${front_wheel_width}" radius="${front_wheel_radius}" mass="${front_wheel_mass}"/>
-  <xacro:wheel name="front_left_wheel"   width="${front_wheel_width}" radius="${front_wheel_radius}" mass="${front_wheel_mass}"/>
-  <xacro:wheel name="rear_right_wheel"   width="${rear_wheel_width}"  radius="${rear_wheel_radius}"  mass="${rear_wheel_mass}"/>
-  <xacro:wheel name="rear_left_wheel"    width="${rear_wheel_width}"  radius="${rear_wheel_radius}"  mass="${rear_wheel_mass}"/>
+  <link name="over_chassis_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 ${M_PI}"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/over_chassis.stl"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 ${M_PI}"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/over_chassis.stl"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+  </link>
+
+  <link name="imu_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+  </link>
+
+  <link name="gps_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+      <material name="light_grey"/>
+    </visual>
+  </link>
+
+  <link name="rear_left_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/rear_left_wheel.stl"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/rear_left_wheel.stl"/>
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+  </link>
+
+  <link name="rear_right_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/rear_right_wheel.stl"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/rear_right_wheel.stl"/>
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+  </link>
+
+  <link name="front_left_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/front_left_wheel.stl"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/front_left_wheel.stl"/>
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+  </link>
+
+  <link name="front_right_wheel_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/front_right_wheel.stl"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      <geometry>
+        <mesh filename="package://tractobots_description/meshes/front_right_wheel.stl"/>
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+  </link>
 
   <!-- Joints -->
   <joint name="chassis_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="chassis"/>
-    <origin xyz="0 0 1.0" rpy="0 0 0"/>
+    <child link="chassis_link"/>
+    <origin xyz="0 0 ${front_wheel_radius}" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="over_chassis_joint" type="fixed">
+    <parent link="chassis_link"/>
+    <child link="over_chassis_link"/>
+    <origin xyz="0 0 ${chassis_height}" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="over_chassis_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0"/> <!-- Need to be set! -->
+  </joint>
+
+  <joint name="gps_joint" type="fixed">
+    <parent link="over_chassis_link"/>
+    <child link="gps_link"/>
+    <origin xyz="0 0 0"/> <!-- Need to be set! -->
   </joint>
 
   <joint name="front_right_wheel_joint" type="fixed">
-    <parent link="chassis"/>
-    <child link="front_right_wheel"/>
-    <origin xyz="${chassis_length/2} ${front_wheel_width/2 + chassis_width/2} 0" rpy="0 0 0"/>
+    <parent link="chassis_link"/>
+    <child link="front_right_wheel_link"/>
+    <origin xyz="${chassis_length/2} ${chassis_width/2} 0" rpy="0 0 0"/>
   </joint>
 
   <joint name="front_left_wheel_joint" type="fixed">
-    <parent link="chassis"/>
-    <child link="front_left_wheel"/>
-    <origin xyz="${chassis_length/2} ${-(front_wheel_width/2 + chassis_width/2)} 0" rpy="0 0 0"/>
+    <parent link="chassis_link"/>
+    <child link="front_left_wheel_link"/>
+    <origin xyz="${chassis_length/2} ${-(chassis_width/2)} 0" rpy="0 0 0"/>
   </joint>
 
   <joint name="rear_right_wheel_joint" type="fixed">
-    <parent link="chassis"/>
-    <child link="rear_right_wheel"/>
-    <origin xyz="${-chassis_length/2} ${rear_wheel_width/2 + chassis_width/2} ${-(front_wheel_radius - rear_wheel_radius)}" rpy="0 0 0"/>
+    <parent link="chassis_link"/>
+    <child link="rear_right_wheel_link"/>
+    <origin xyz="${-chassis_length/2} ${chassis_width/2} ${-(front_wheel_radius - rear_wheel_radius)}" rpy="0 0 0"/>
   </joint>
 
   <joint name="rear_left_wheel_joint" type="fixed">
-    <parent link="chassis"/>
-    <child link="rear_left_wheel"/>
-    <origin xyz="${-chassis_length/2} ${-(rear_wheel_width/2 + chassis_width/2)} ${-(front_wheel_radius - rear_wheel_radius)}" rpy="0 0 0"/>
+    <parent link="chassis_link"/>
+    <child link="rear_left_wheel_link"/>
+    <origin xyz="${-chassis_length/2} ${-(chassis_width/2)} ${-(front_wheel_radius - rear_wheel_radius)}" rpy="0 0 0"/>
   </joint>
 
 </robot>
