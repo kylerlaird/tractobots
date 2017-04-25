@@ -1,0 +1,41 @@
+<package format="2">
+  <name>swri_image_util</name>
+  <version>0.2.4</version>
+  <description>
+
+     swri_image_util
+
+  </description>
+  <author>Kris Kozak</author>
+  <maintainer email="kkozak@swri.org">Kris Kozak</maintainer>
+  <license>BSD</license>
+  <url>https://github.com/swri-robotics/marti_common</url>
+ 
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>pkg-config</buildtool_depend>
+
+  <depend>camera_calibration_parsers</depend>
+  <depend>cv_bridge</depend>
+  <depend>eigen</depend>
+  <depend>geometry_msgs</depend>
+  <depend>image_geometry</depend>
+  <depend>image_transport</depend>
+  <depend>libqt5-opengl-dev</depend>
+  <depend>libqt5-gui</depend>
+  <depend>message_filters</depend>
+  <depend>nav_msgs</depend>
+  <depend>nodelet</depend>
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>swri_math_util</depend>
+  <depend>swri_opencv_util</depend>
+  <depend>tf</depend>
+
+  <test_depend>rostest</test_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+  </export>
+</package>
+
