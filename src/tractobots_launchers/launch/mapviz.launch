@@ -1,0 +1,17 @@
+<launch>
+    <node pkg="tf" type="static_transform_publisher" name="swri_transform" args="0 0 0 0 0 0 /map /odom 100"  />
+
+    <node pkg="swri_transform_util" type="initialize_origin.py" name="initialize_origin" >
+        <param name="local_xy_frame" value="/map"/>
+        <param name="local_xy_origin" value="tractofarm"/>
+        <rosparam param="local_xy_origins">
+            [{ name: tractofarm,
+             latitude: 40.8882561488,
+             longitude: -87.1996192638,
+             altitude: 0.0,
+             heading: 0.0}]
+        </rosparam>
+    </node>
+
+    <node pkg="mapviz" type="mapviz" name="mapviz"/>
+</launch>

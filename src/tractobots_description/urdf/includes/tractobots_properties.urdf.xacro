@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot name="xacro_properties"                           xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="M_PI" 				 value="3.1415926535897931"/>
+
+  <!-- Constants for chassis -->
+  <xacro:property name="chassis_height" 		 value="0.001"/>
+  <xacro:property name="chassis_length" 		 value="2.4"/>
+  <xacro:property name="chassis_width"  		 value="1.348"/>
+  <xacro:property name="chassis_mass"   		 value="20" />
+
+  <!-- Data for wheel dimensions from: http://agri.firestone.eu/down/FS_AGDatabook2016_Brochure_EU.pdf -->
+  <!-- Constants for front wheels (320/85R24) -->
+  <xacro:property name="front_wheel_radius" 		 value="0.575"/>
+  <xacro:property name="front_wheel_width"  		 value="0.313"/>
+  <xacro:property name="front_wheel_mass"   		 value="4"/> <!-- Must be calculated -->
+  <xacro:property name="front_wheel_track"  		 value="0.6"/> <!-- Must be calculated -->
+
+  <!-- Constants for rear wheels (460/85R30) -->
+  <xacro:property name="rear_wheel_radius"     value="0.768"/>
+  <xacro:property name="rear_wheel_width"      value="0.484"/>
+  <xacro:property name="rear_wheel_mass"       value="2"/> <!-- Must be calculated -->
+  <xacro:property name="rear_wheel_track"      value="0.535"/> <!-- Must be calculated -->
+
+</robot>

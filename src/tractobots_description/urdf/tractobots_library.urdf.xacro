@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<robot name="tractobots" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Import Tractobots properties -->
+  <xacro:include filename="$(find tractobots_description)/urdf/includes/tractobots_properties.urdf.xacro" />
+
+  <!-- Import Tractobots materials -->
+  <xacro:include filename="$(find tractobots_description)/urdf/includes/tractobots_materials.urdf.xacro" />
+
+  <!-- Import Tractobots model -->
+  <xacro:include filename="$(find tractobots_description)/urdf/includes/tractobots_model.urdf.xacro" />
+
+</robot>

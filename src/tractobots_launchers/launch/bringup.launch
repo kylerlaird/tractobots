@@ -1,0 +1,17 @@
+<launch>
+
+	<!-- Robot TF Tree publisher -->
+	<include file="$(find tractobots_description)/launch/tractobots_tf_tree.launch"/>
+
+	<!-- gps/dict to NavSatFix msg converter -->
+	<node pkg="tractobots_robot_localization" type="gps_parser.py" name="gps_parser" output="screen"/>
+
+	<!-- imu msg frame_id fixer -->
+	<node pkg="tractobots_robot_localization" type="imu_publisher.py" name="imu_publisher" output="screen"/>
+
+	<!-- EKF Fusion node -->
+	<include file="$(find tractobots_robot_localization)/launch/ekf_localization_node.launch"/>
+
+	<!-- NavSatFix odometry publisher -->
+	<include file="$(find tractobots_robot_localization)/launch/navsat_transform_node.launch"/>
+</launch>
