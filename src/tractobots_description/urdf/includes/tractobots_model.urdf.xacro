@@ -158,7 +158,7 @@
   <joint name="imu_joint" type="fixed">
     <parent link="over_chassis_link"/>
     <child link="imu_link"/>
-    <origin xyz="0 0 0"/> <!-- Need to be set! -->
+    <origin xyz="0 0 0" rpy="0 0 0"/> <!-- Need to be set! -->
   </joint>
 
   <joint name="gps_joint" type="fixed">

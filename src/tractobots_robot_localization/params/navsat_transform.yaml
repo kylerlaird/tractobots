@@ -1,5 +1,5 @@
 # Frequency of the main run loop
-frequency: 30
+frequency: 10
 
 # Delay time, in seconds, before we calculate the transform from the UTM frame to your world frame. This is especially
 # important if you have use_odometry_yaw set to true. Defaults to 0.
@@ -26,7 +26,7 @@ broadcast_utm_transform: true
 
 # If this is true, all received odometry data is converted back to a lat/lon and published as a NavSatFix message as
 # /gps/filtered. Defaults to false.
-publish_filtered_gps: false
+publish_filtered_gps: true
 
 # If this is true, the node ignores the IMU data and gets its heading from the odometry source (typically the
 # /odometry/filtered topic coming from one of robot_localization's state estimation nodes). BE CAREFUL when using this!

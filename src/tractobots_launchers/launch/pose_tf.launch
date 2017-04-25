@@ -1,0 +1,9 @@
+<launch>
+
+	<!-- Pose transformer -->
+	<node pkg="tractobots_robot_localization" type="pose_transformer.py" name="pose_transformer" output="screen">
+		<param name="from_frame" 		value="base_link" />
+        <param name="to_frame" 			value="utm" />
+    </node>
+
+</launch>

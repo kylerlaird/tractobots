@@ -34,13 +34,13 @@
 -->
 
 <launch>
-  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" clear_params="true">
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" clear_params="true" output="screen">
     <rosparam command="load" file="$(find tractobots_robot_localization)/params/navsat_transform.yaml" />
 
       <!-- Placeholders for input remapping. -->
-      <remap from="imu/data" to="tfsensors/imu1"/>
+      <remap from="imu/data" to="imu"/>
       <remap from="odometry/filtered" to="odometry/ekf"/>
-      <remap from="gps/fix" to="fix"/>
+      <remap from="gps/fix" to="gps/fix"/>
 
   </node>
 </launch>
