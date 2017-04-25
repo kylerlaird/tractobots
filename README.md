@@ -2,7 +2,7 @@
 
 Field robots
 
-Installation (ROS Kinetic)
+Dependencies installation (ROS Kinetic)
 ------------
 ROS packages:
 
