@@ -9,6 +9,9 @@
 	<!-- imu msg frame_id fixer -->
 	<node pkg="tractobots_robot_localization" type="imu_publisher.py" name="imu_publisher" output="screen"/>
 
+	<!-- Tinkerforge sensors launch file for IMU -->
+	<include file="$(find tinkerforge_sensors)/launch/tinkerforge_sensors.launch"/>
+
 	<!-- EKF Fusion node -->
 	<include file="$(find tractobots_robot_localization)/launch/ekf_localization_node.launch"/>
 
